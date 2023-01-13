@@ -17,7 +17,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async registerUser(User: Users, Adress: Address): Promise<Users> {
-    const email = User.mail;
+    const mail = User.mail;
     const stripeId = await this.stripeDataSource.customers.create({
       phone: User.phone,
       name: User.firstname + "" + User.lastname,
