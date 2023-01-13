@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Adress {
+  Id         String  @id @db.UniqueIdentifier
+  adressName String
+  city       String
+  postalCode String
+  Country    String
+  IsDisabled Boolean
+  Lives      Lives[]
+}
+
+model Lives {
+  UserId   String @db.UniqueIdentifier
+  AdressId String @db.UniqueIdentifier
+  Adress   Adress @relation(fields: [AdressId], references: [Id], onDelete: Cascade, map: "FK_Adress")
+  User     User   @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "FK_User")
+
+  @@id([UserId, AdressId], map: "Lives_pk")
+}
+
+model Order {
+  Id             String @id @db.UniqueIdentifier
+  Id_User        String @db.UniqueIdentifier
+  Facturation    String
+  DeliveryAdress String
+  User           User   @relation(fields: [Id_User], references: [Id], onDelete: Cascade)
+}
+
+model PaymentInfo {
+  Id             String  @id @db.UniqueIdentifier
+  Card           String
+  ExpirationTime String
+  CVC            String
+  Saved          Saved[]
+}
+
+model Role {
+  Id         Int     @id @default(autoincrement())
+  Label      String
+  IsDisabled Boolean
+  User       User[]
+}
+
+model Saved {
+  Id_User        String      @db.UniqueIdentifier
+  Id_PaymentInfo String      @db.UniqueIdentifier
+  PaymentInfo    PaymentInfo @relation(fields: [Id_PaymentInfo], references: [Id], onDelete: Cascade, map: "FK_PaymentInfo")
+  User           User        @relation(fields: [Id_User], references: [Id], onDelete: Cascade, map: "FK_UserPayement")
+
+  @@id([Id_User, Id_PaymentInfo], map: "User_Payment_pk")
+}
+
+model User {
+  Id         String  @id @db.UniqueIdentifier
+  Id_Role    Int
+  FirstName  String
+  LastName   String
+  Mail       String
+  Phone      String
+  IsDisabled Boolean
+  Password   String
+  stripeId   String?
+  Lives      Lives[]
+  Order      Order[]
+  Saved      Saved[]
+  Role       Role    @relation(fields: [Id_Role], references: [Id], onDelete: Cascade)
+}
