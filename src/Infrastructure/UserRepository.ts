@@ -22,7 +22,7 @@ export class UserRepository implements IUserRepository {
       phone: User.phone,
       name: User.firstname + "" + User.lastname,
     });
-
+    
     const data = await this.userDataSource.user.create({
       data: {
         Id_Role: User.roleId,
@@ -65,8 +65,7 @@ export class UserRepository implements IUserRepository {
         Order: true,
         Lives: { include: { Adress: true } },
       },
-    });
-
+    });    
     const adress: Address[] = [];
     const role = RoleMapper.ToDomain(data.Role);
     const orders = OrdersMapper.ToDomainEnities(data.Order);

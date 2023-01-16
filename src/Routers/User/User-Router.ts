@@ -17,13 +17,14 @@ export default function UsersRouter(
 
   router.post("/register", async (req: Request, res: Response) => {
     try {
+            
       const adress: Address[] = [];
       const userAdress = new Address(
         randomUUID(),
-        req.body.adress,
-        req.body.codePostal,
-        req.body.city,
-        req.body.country
+        req.body.adress.adress,
+        req.body.adress.codePostal,
+        req.body.adress.city,
+        req.body.adress.country
       );
       adress.push(userAdress);
       const role = new Roles(req.body.IdRole, req.body.Label, false);
@@ -31,16 +32,15 @@ export default function UsersRouter(
       const user = new Users(
         "",
         req.body.IdRole,
-        req.body.firstname,
-        req.body.lastname,
-        req.body.phone,
-        req.body.mail,
-        req.body.password,
+        req.body.user.firstname,
+        req.body.user.lastname,
+        req.body.user.phone,
+        req.body.user.mail,
+        req.body.user.password,
         adress,
         role,
         order
-      );
-
+      );      
       const userCreated = await RegisterUserUseCase.execute(user);
 
       res.send(userCreated);
@@ -56,7 +56,7 @@ export default function UsersRouter(
 
     if (data != undefined) {
       const token = jwt.sign(
-        { user_id: data.id, mail },
+        { user_id: data.id, mail, role:data.roleId },
         process.env.TOKEN_KEY as string,
         { expiresIn: "2h" }
       );
