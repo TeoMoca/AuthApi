@@ -41,7 +41,7 @@ export default function UsersRouter(
         role,
         order
       );      
-      const userCreated = await RegisterUserUseCase.execute(user);
+      const userCreated = await RegisterUserUseCase.execute(user, req.body.sponsorMail);
 
       res.send(userCreated);
     } catch (err) {
@@ -61,6 +61,7 @@ export default function UsersRouter(
         { expiresIn: "2h" }
       );
       const userInfo = { data, message: "User Connected", token: token };
+      console.log(userInfo)
       return res.status(200).json(userInfo);
     }
 

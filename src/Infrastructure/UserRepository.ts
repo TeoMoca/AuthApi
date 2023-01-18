@@ -7,6 +7,7 @@ import { RoleMapper } from "./Mappage/Role/RoleMapper";
 import { UserMapper } from "./Mappage/User/UserMapper";
 import { AdressMapper } from "./Mappage/Adress/AdressMapper";
 import { OrdersMapper } from "./Mappage/Orders/OrdersMapper";
+import { randomUUID } from "crypto";
 
 export class UserRepository implements IUserRepository {
   userDataSource: PrismaClient;
@@ -16,12 +17,31 @@ export class UserRepository implements IUserRepository {
     this.stripeDataSource = stripeDataSource;
   }
 
-  async registerUser(User: Users, Adress: Address): Promise<Users> {
+  async registerUser(User: Users, Adress: Address, sponsorMail:string): Promise<Users> {
     const mail = User.mail;
     const stripeId = await this.stripeDataSource.customers.create({
       phone: User.phone,
       name: User.firstname + "" + User.lastname,
     });
+
+    const sponsor = await this.userDataSource.user.findFirst({
+      where:{Mail: sponsorMail}
+  })
+ 
+  if(sponsor != null){          
+      await this.userDataSource.user.update({
+          where:{Id:sponsor.Id},
+          data:{IsSponsor: true}
+      })
+      await this.userDataSource.refer.create({
+        data:{
+          Id: randomUUID(),
+          CustomerId:User.id,
+          ReferId:sponsor.Id,
+          RoleId:User.roleId,
+        },
+      })
+  }
     
     const data = await this.userDataSource.user.create({
       data: {
@@ -34,6 +54,7 @@ export class UserRepository implements IUserRepository {
         Phone: User.phone,
         Password: User.password,
         stripeId: stripeId.id,
+        IsSponsor: false,
         Lives: {
           create: [
             {
@@ -63,6 +84,8 @@ export class UserRepository implements IUserRepository {
         stripeId: true,
         Role: true,
         Order: true,
+        ReferCode:true,
+        IsSponsor:true,
         Lives: { include: { Adress: true } },
       },
     });    
