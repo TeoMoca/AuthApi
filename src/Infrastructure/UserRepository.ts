@@ -22,7 +22,6 @@ export class UserRepository implements IUserRepository {
       phone: User.phone,
       name: User.firstname + "" + User.lastname,
     });
-    
     const data = await this.userDataSource.user.create({
       data: {
         Id_Role: User.roleId,
@@ -34,6 +33,7 @@ export class UserRepository implements IUserRepository {
         Phone: User.phone,
         Password: User.password,
         stripeId: stripeId.id,
+        IsSponsor:false,
         Lives: {
           create: [
             {
@@ -63,9 +63,12 @@ export class UserRepository implements IUserRepository {
         stripeId: true,
         Role: true,
         Order: true,
+        IsSponsor: true,
+        ReferCode:true,
         Lives: { include: { Adress: true } },
       },
     });    
+    console.log(data)
     const adress: Address[] = [];
     const role = RoleMapper.ToDomain(data.Role);
     const orders = OrdersMapper.ToDomainEnities(data.Order);

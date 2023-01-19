@@ -68,8 +68,17 @@ model User {
   IsDisabled Boolean
   Password   String
   stripeId   String?
+  ReferCode  String?
+  IsSponsor  Boolean
   Lives      Lives[]
   Order      Order[]
   Saved      Saved[]
   Role       Role    @relation(fields: [Id_Role], references: [Id], onDelete: Cascade)
+}
+
+model Refer {
+  Id         String @id @db.UniqueIdentifier
+  ReferId    String @db.UniqueIdentifier
+  CustomerId String @db.UniqueIdentifier
+  RoleId     Int
 }
